@@ -35,7 +35,6 @@ public class HelloWorld implements RequestHandler<Map<String, Object>, Map<Strin
 			response.put("headers", headers);
 			response.put("body", "{\"message\": \"Hello from Lambda\"}");
 		} else {
-
 			response.put("statusCode", 400);
 			response.put("headers", headers);
 			response.put("body", String.format(
