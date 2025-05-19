@@ -25,30 +25,43 @@ public class HelloWorld implements RequestHandler<Map<String, Object>, Map<Strin
 
 	@Override
 	public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
-
+		// Extract HTTP method and path from the event object
 		Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
 		Map<String, Object> http = (Map<String, Object>) requestContext.get("http");
 		String httpMethod = (String) http.get("method");
 		String path = (String) http.get("path");
 
-
-		Map<String, Object> response = new HashMap<>();
+		// Create headers for the response
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", "application/json");
-		headers.put("Access-Control-Allow-Origin", "*");
+		headers.put("Access-Control-Allow-Origin", "*"); // Optional: for CORS support
+
+		// Create the top-level response object
+		Map<String, Object> response = new HashMap<>();
 
 		if ("GET".equalsIgnoreCase(httpMethod) && "/hello".equals(path)) {
-			response.put("statusCode", 200);
-			response.put("headers", headers);
-			response.put("body", "{\"message\": \"Hello from Lambda\"}");
+			// Create the body for the successful response (with statusCode included inside the body)
+			Map<String, Object> body = new HashMap<>();
+			body.put("statusCode", 200);
+			body.put("message", "Hello from Lambda");
+
+			response.put("statusCode", 200); // HTTP status code
+			response.put("headers", headers); // Headers
+			response.put("body", body); // Body containing the expected response structure
 		} else {
-			response.put("statusCode", 400);
-			response.put("headers", headers);
-			response.put("body", String.format(
-					"{\"statusCode\": 400, \"message\": \"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s\"}",
+			// Create the body for the error response
+			Map<String, Object> body = new HashMap<>();
+			body.put("statusCode", 400);
+			body.put("message", String.format(
+					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
 					path, httpMethod
 			));
+
+			response.put("statusCode", 400); // HTTP status code
+			response.put("headers", headers); // Headers
+			response.put("body", body); // Body containing the error response structure
 		}
+
 		return response;
 	}
 }
