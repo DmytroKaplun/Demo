@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @LambdaHandler(
-    lambdaName = "hello_world",
+    lambdaName = "hello_world_task02",
 	roleName = "hello_world-role",
 	isPublishVersion = true,
 	aliasName = "${lambdas_alias_name}",
