@@ -35,8 +35,8 @@
     "tags": {}
   },
   "task3_api": {
-    "resource_type": "api_gateway",
     "deploy_stage": "api",
+    "resource_type": "api_gateway",
     "dependencies": [
       {
         "resource_name": "hello_world",
@@ -46,17 +46,11 @@
     "resources": {
       "/hello": {
         "GET": {
+          "authorization_type": "NONE",
+          "enable_proxy": true,
           "lambda_name": "hello_world",
-          "integration_type": "AWS_PROXY",
-          "request_parameters": {},
-          "request_models": {},
-          "responses": {
-            "200": {
-              "response_parameters": {},
-              "response_models": {},
-              "response_template": "{\n  \"statusCode\": 200,\n  \"message\": \"Hello from Lambda\"\n}"
-            }
-          }
+          "api_key_required": false,
+          "default_error_pattern": true
         }
       }
     },
