@@ -35,8 +35,8 @@
     "tags": {}
   },
   "task3_api": {
-    "deploy_stage": "api",
     "resource_type": "api_gateway",
+    "deploy_stage": "api",
     "dependencies": [
       {
         "resource_name": "hello_world",
@@ -45,11 +45,36 @@
     ],
     "resources": {
       "/hello": {
+        "enable_cors": true,
         "GET": {
           "authorization_type": "NONE",
-          "enable_proxy": true,
+          "integration_type": "lambda",
           "lambda_name": "hello_world",
           "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {
+            "application/json": "{\n  \"body\": $input.json('$')\n}"
+          },
+          "responses": [
+            {
+              "statusCode": 200,
+              "response_parameters": {
+                "method.response.header.Content-Type": "'application/json'"
+              },
+              "response_template": {
+                "application/json": "{\n  \"message\": \"Hello from Lambda\",\n  \"statusCode\": 200\n}"
+              }
+            }
+          ],
+          "integration_responses": [
+            {
+              "statusCode": 200,
+              "selection_pattern": ".*",
+              "response_templates": {
+                "application/json": "{\n  \"message\": \"Hello from Lambda\",\n  \"statusCode\": 200\n}"
+              }
+            }
+          ],
           "default_error_pattern": true
         }
       }
