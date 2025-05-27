@@ -13,13 +13,13 @@ import java.util.Map;
 
 @LambdaHandler(
 		lambdaName = "hello_world",
-		roleName = "hello_world-role",
+		roleName = "task03-lambda01-role",
 		runtime= DeploymentRuntime.JAVA11,
 		isPublishVersion = true,
 		aliasName = "${lambdas_alias_name}",
 		logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
-public class HelloWorld implements RequestHandler<Object, Map<String, Object>> {
+public class Task03Lambda01 implements RequestHandler<Object, Map<String, Object>> {
 
 	public Map<String, Object> handleRequest(Object request, Context context) {
 		context.getLogger().log("Invocation started: " + getTimeStamp());

@@ -24,7 +24,7 @@
     },
     "resource_type": "iam_policy"
   },
-  "hello_world-role": {
+  "task03-lambda01-role": {
     "predefined_policies": [],
     "principal_service": "lambda",
     "custom_policies": [
