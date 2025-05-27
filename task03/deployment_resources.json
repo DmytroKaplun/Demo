@@ -22,8 +22,7 @@
       ],
       "Version": "2012-10-17"
     },
-    "resource_type": "iam_policy",
-    "tags": {}
+    "resource_type": "iam_policy"
   },
   "hello_world-role": {
     "predefined_policies": [],
@@ -32,7 +31,9 @@
       "lambda-basic-execution"
     ],
     "resource_type": "iam_role",
-    "tags": {}
+    "allowed_accounts": [
+      "${account_id}"
+    ]
   },
   "task3_api": {
     "resource_type": "api_gateway",
@@ -45,40 +46,19 @@
     ],
     "resources": {
       "/hello": {
-        "enable_cors": true,
+        "enable_cors": false,
         "GET": {
           "authorization_type": "NONE",
+          "default_error_pattern": true,
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
+          "integration_request_body_template": {
+          },
           "integration_type": "lambda",
           "lambda_name": "hello_world",
-          "api_key_required": false,
-          "method_request_parameters": {},
-          "integration_request_body_template": {
-            "application/json": "{\n  \"body\": $input.json('$')\n}"
-          },
-          "responses": [
-            {
-              "statusCode": 200,
-              "response_parameters": {
-                "method.response.header.Content-Type": "'application/json'"
-              },
-              "response_template": {
-                "application/json": "{\n  \"message\": \"Hello from Lambda\",\n  \"statusCode\": 200\n}"
-              }
-            }
-          ],
-          "integration_responses": [
-            {
-              "statusCode": 200,
-              "selection_pattern": ".*",
-              "response_templates": {
-                "application/json": "{\n  \"message\": \"Hello from Lambda\",\n  \"statusCode\": 200\n}"
-              }
-            }
-          ],
-          "default_error_pattern": true
+          "method_request_parameters": {
+          }
         }
       }
-    },
-    "tags": {}
+    }
   }
 }
