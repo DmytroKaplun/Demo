@@ -1,12 +1,18 @@
 package com.task05.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
 public class EventRequest {
     private final int principalId;
     private final Map<String, Object> content;
 
-    public EventRequest(int principalId, Map<String, Object> content) {
+
+    @JsonCreator
+    public EventRequest(@JsonProperty("principalId") int principalId,
+                        @JsonProperty("content") Map<String, Object> content) {
         validate(principalId, content);
         this.principalId = principalId;
         this.content = content;
