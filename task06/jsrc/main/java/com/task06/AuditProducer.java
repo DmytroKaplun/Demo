@@ -36,7 +36,10 @@ import java.util.UUID;
 		targetTable = "Configuration",
 		batchSize = 1
 )
-@DependsOn(name = "Configuration", resourceType = ResourceType.DYNAMODB_TABLE)
+@DependsOn(
+		name = "Configuration",
+		resourceType = ResourceType.DYNAMODB_TABLE
+)
 public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 	public static final String ITEM_KEY = "itemKey";
 	public static final String MODIFICATION_TIME = "modificationTime";
@@ -71,45 +74,91 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 	public Void handleRequest(DynamodbEvent event, Context context) {
 		for (DynamodbEvent.DynamodbStreamRecord record : event.getRecords()) {
 			try {
-				if (INSERT.equals(record.getEventName()) || MODIFY.equals(record.getEventName())) {
-					// Extract the new image (new state of the item)
-					var newImage = record.getDynamodb().getNewImage();
-
-					// Extract the item key and value
-					String key = newImage.get(KEY).getS();
-					int value = Integer.parseInt(newImage.get(VALUE).getN());
-
-					// Create the newValue object
-					var newValue = new Item()
-							.withString(KEY, key)
-							.withNumber(VALUE, value);
-
-					// Create audit entry
-					String id = UUID.randomUUID().toString();
-					String modificationTime = Instant.now().toString();
-
-					Item auditEntry = new Item()
-							.withPrimaryKey(ID, id)
-							.withString(ITEM_KEY, key)
-							.withString(MODIFICATION_TIME, modificationTime)
-							.withMap(NEW_VALUE, newValue.asMap());
-
-					// Save the audit entry to the Audit table
-					saveEventToDynamoDB(auditEntry);
-
-					context.getLogger().log("Audit entry created: " + auditEntry.toJSONPretty());
+				String eventName = record.getEventName(); // INSERT, MODIFY, REMOVE
+				if (INSERT.equals(eventName)) {
+					handleInsertEvent(record, context);
+				} else if (MODIFY.equals(eventName)) {
+					handleModifyEvent(record, context);
 				}
-			} catch (IllegalStateException e) {
-				context.getLogger().log("Configuration Error: " + e.getMessage());
-
-			} catch (IllegalArgumentException e) {
-				context.getLogger().log("Validation Error: " + e.getMessage());
-
-			} catch (AmazonDynamoDBException e) {
-				context.getLogger().log("DynamoDB Error: " + e.getMessage());
+			} catch (Exception e) {
+				context.getLogger().log("Error processing record: " + e.getMessage());
 			}
 		}
 		return null;
+	}
+
+	private void handleModifyEvent(DynamodbEvent.DynamodbStreamRecord record, Context context) {
+		// Get OLD_IMAGE and NEW_IMAGE for the modified item
+		var oldImage = record.getDynamodb().getOldImage();
+		var newImage = record.getDynamodb().getNewImage();
+
+		if (oldImage == null || newImage == null) {
+			context.getLogger().log("Missing OLD_IMAGE or NEW_IMAGE for MODIFY event.");
+			return;
+		}
+
+		// Extract the item key and values
+		String key = newImage.get("key").getS(); // The item key
+		int oldValue = Integer.parseInt(oldImage.get(VALUE).getN());
+		int newValue = Integer.parseInt(newImage.get(VALUE).getN());
+
+		// Check if the "value" attribute was updated
+		if (oldValue != newValue) {
+			// Create a new audit entry
+			String id = UUID.randomUUID().toString();
+			String modificationTime = Instant.now().toString();
+
+			Item auditEntry = new Item()
+					.withPrimaryKey(ID, id)
+					.withString(ITEM_KEY, key)
+					.withString(MODIFICATION_TIME, modificationTime)
+					.withString("updatedAttribute", VALUE)
+					.withNumber("oldValue", oldValue)
+					.withNumber(NEW_VALUE, newValue);
+
+			// Save the audit entry to the Audit table
+			saveEventToDynamoDB(auditEntry);
+
+			context.getLogger().log("Audit entry created for MODIFY: " + auditEntry.toJSONPretty());
+		}
+	}
+
+	private void handleInsertEvent(DynamodbEvent.DynamodbStreamRecord record, Context context) {
+		// Get the NEW_IMAGE for the inserted item
+		var newImage = record.getDynamodb().getNewImage();
+
+		if (newImage == null) {
+			context.getLogger().log("Missing NEW_IMAGE for INSERT event.");
+			return;
+		}
+		if (!newImage.containsKey(KEY) || !newImage.containsKey(VALUE)) {
+			context.getLogger().log("NEW_IMAGE is missing required attributes: 'key' or 'value'.");
+			return;
+		}
+
+		// Extract the item key and value
+		String key = newImage.get(KEY).getS();
+		int value = Integer.parseInt(newImage.get(VALUE).getN());
+
+		// Create the newValue object
+		var newValue = new Item()
+				.withString(KEY, key)
+				.withNumber(VALUE, value);
+
+		// Create audit entry
+		String id = UUID.randomUUID().toString();
+		String modificationTime = Instant.now().toString();
+
+		Item auditEntry = new Item()
+				.withPrimaryKey(ID, id)
+				.withString(ITEM_KEY, key)
+				.withString(MODIFICATION_TIME, modificationTime)
+				.withMap(NEW_VALUE, newValue.asMap());
+
+		// Save the audit entry to the Audit table
+		saveEventToDynamoDB(auditEntry);
+
+		context.getLogger().log("Audit entry created: " + auditEntry.toJSONPretty());
 	}
 
 	private void saveEventToDynamoDB (Item auditEntry){
