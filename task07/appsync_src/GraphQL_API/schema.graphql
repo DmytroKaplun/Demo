@@ -9,7 +9,7 @@ type Event {
 }
 
 type Mutation {
-	createEvent(userId: Int!, payLoad: AWSJSON!): Event
+	createEvent(userId: Int!, payLoad: AWSJSON!): Event!
 }
 
 type Query {

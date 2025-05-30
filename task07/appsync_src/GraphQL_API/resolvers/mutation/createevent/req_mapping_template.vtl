@@ -6,14 +6,14 @@
 
 ## Prepare the DynamoDB PutItem input
 {
-  "version": "2018-05-29",
-  "operation": "PutItem",
-  "key": {
-    "id": { "S": "$id" }
-  },
-  "attributeValues": {
-    "userId": { "N": "$ctx.args.userId" },
-    "createdAt": { "S": "$createdAt" },
-    "payLoad": { "M": $util.parseJson($ctx.args.payLoad) }
-  }
+    "version": "2018-05-29",
+    "operation": "PutItem",
+    "key": {
+        "id": $util.dynamodb.toDynamoDBJson($id)
+    },
+    "attributeValues": {
+        "userId": $util.dynamodb.toDynamoDBJson($ctx.args.userId),
+        "createdAt": $util.dynamodb.toDynamoDBJson($createdAt),
+        "payLoad": $util.dynamodb.toDynamoDBJson($ctx.args.payLoad)
+    }
 }
