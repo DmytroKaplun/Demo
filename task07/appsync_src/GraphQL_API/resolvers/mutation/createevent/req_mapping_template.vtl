@@ -1,19 +1,26 @@
 ## Generate a unique ID for the event
 #set($id = $util.autoId())
 
-## Get the current timestamp
+## Get the current timestamp in correct ISO8601 format
 #set($createdAt = $util.time.nowISO8601())
 
-## Prepare the DynamoDB PutItem input
+## Parse the payload JSON
+#set($payLoad = $util.parseJson($ctx.args.payLoad))
+
+## Save the generated values to stash for later use
+#set($ctx.stash.id = $id)
+#set($ctx.stash.createdAt = $createdAt)
+
+## DynamoDB PutItem input
 {
-    "version": "2018-05-29",
-    "operation": "PutItem",
-    "key": {
-        "id": $util.dynamodb.toDynamoDBJson($id)
-    },
-    "attributeValues": {
-        "userId": $util.dynamodb.toDynamoDBJson($ctx.args.userId),
-        "createdAt": $util.dynamodb.toDynamoDBJson($createdAt),
-        "payLoad": $util.dynamodb.toDynamoDBJson($ctx.args.payLoad)
-    }
+"version": "2018-05-29",
+"operation": "PutItem",
+"key": {
+"id": { "S": "$id" }
+},
+"attributeValues": {
+"userId": { "N": "$ctx.args.userId" },
+"createdAt": { "S": "$createdAt" },
+"payLoad": $util.dynamodb.toDynamoDBJson($payLoad)
+}
 }

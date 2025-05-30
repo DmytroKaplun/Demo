@@ -1,4 +1,10 @@
-{
-    "id": "$context.result.id",
-    "createdAt": "$context.result.createdAt"
-}
+## Handle any DynamoDB errors
+#if($ctx.error)
+    $util.error($ctx.error.message, $ctx.error.type)
+#end
+
+## Manually construct the response using the values stored in stash
+$util.toJson({
+    "id": "$ctx.stash.id",
+    "createdAt": "$ctx.stash.createdAt"
+})
