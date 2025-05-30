@@ -4,8 +4,8 @@
 ## Get the current timestamp in correct ISO8601 format
 #set($createdAt = $util.time.nowISO8601())
 
-## Parse the payload JSON
-#set($payLoad = $util.parseJson($ctx.args.payLoad))
+## If payLoad is already an object, skip parsing
+#set($payLoad = $ctx.args.payLoad)
 
 ## Save the generated values to stash for later use
 #set($ctx.stash.id = $id)
