@@ -1,10 +1,15 @@
 ## Return the fetched event
 #if($ctx.result)
     $util.toJson({
-        "id": $ctx.result.id.S,
-        "userId": $ctx.result.userId.N,
-        "createdAt": $ctx.result.createdAt.S,
-        "payLoad": $ctx.result.payLoad.M
+        "id": "$ctx.result.id",
+        "userId": $ctx.result.userId,
+        "createdAt": "$ctx.result.createdAt",
+        "payLoad": {
+        "meta": {
+        "key1": $ctx.result.payLoad.meta.key1,
+        "key2": "$ctx.result.payLoad.meta.key2"
+    }
+    }
     })
 #else
     $util.error("Event not found.", "NotFound")
