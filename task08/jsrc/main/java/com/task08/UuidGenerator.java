@@ -2,6 +2,7 @@ package com.task08;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.s3.model.Bucket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariable;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariables;
@@ -30,7 +31,7 @@ import java.util.stream.IntStream;
 	logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
 @EnvironmentVariables(value = {
-		@EnvironmentVariable(key = "table_name", value = "${target_table}"),
+		@EnvironmentVariable(key = "bucket_name", value = "${target_bucket}"),
 		@EnvironmentVariable(key = "region", value = "${region}")}
 )
 @RuleEventSource(
@@ -41,7 +42,7 @@ import java.util.stream.IntStream;
 		resourceType = ResourceType.CLOUDWATCH_RULE
 )
 public class UuidGenerator implements RequestHandler<Object, Map<String, Object>> {
-	private static final String TABLE_NAME = "table_name";
+	private static final String TABLE_NAME = "bucket_name";
 	public static final String REGION = "region";
 
 	public Map<String, Object> handleRequest(Object request, Context context) {
