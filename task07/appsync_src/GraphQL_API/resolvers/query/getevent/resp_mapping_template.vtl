@@ -1,0 +1,11 @@
+## Return the fetched event
+#if($ctx.result)
+{
+"id": "$ctx.result.id.S",
+"userId": $ctx.result.userId.N,
+"createdAt": "$ctx.result.createdAt.S",
+"payLoad": $util.toJson($ctx.result.payLoad.M)
+}
+#else
+    $util.error("Event not found.", "NotFound")
+#end

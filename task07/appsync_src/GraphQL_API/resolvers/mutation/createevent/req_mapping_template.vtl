@@ -1,0 +1,19 @@
+## Generate a unique ID for the event
+#set($id = $util.autoId())
+
+## Get the current timestamp
+#set($createdAt = $util.time.nowISO8601())
+
+## Prepare the DynamoDB PutItem input
+{
+  "version": "2018-05-29",
+  "operation": "PutItem",
+  "key": {
+    "id": { "S": "$id" }
+  },
+  "attributeValues": {
+    "userId": { "N": "$ctx.args.userId" },
+    "createdAt": { "S": "$createdAt" },
+    "payLoad": { "M": $util.parseJson($ctx.args.payLoad) }
+  }
+}
