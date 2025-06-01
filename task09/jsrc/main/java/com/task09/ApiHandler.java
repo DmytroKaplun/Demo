@@ -50,11 +50,18 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		String path = (String) request.get("path");
 		String method = (String) request.get("httpMethod");
 
+		String functionName = context.getFunctionName(); // e.g., cmtr-3jp7qfiy-api_handler
+
+		// Dynamically construct the expected base path from the Lambda function's name
+		String dynamicBasePath = functionName.split("-")[0] + "-" + functionName.split("-")[1]; // Extract "cmtr-3jp7qfiy"
+		String expectedPath = "/" + dynamicBasePath;
+
+
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
 			response.put("statusCode", 400);
 			response.put("message", String.format(
 					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
-					path, method
+					expectedPath, method
 			));
 			return response;
 		}
@@ -68,6 +75,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			// Fetch weather data from Open-Meteo API
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast(latitude, longitude);
 
+//			orderedWeatherData.put("message", String.format(
+//					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
+//					path, method
+//			));
 			orderedWeatherData.put("latitude", latitude);
 			orderedWeatherData.put("longitude", longitude);
 			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
