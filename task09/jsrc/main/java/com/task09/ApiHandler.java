@@ -46,9 +46,11 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 	}
 
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		String path = (String) request.get("path");
-		String method = (String) request.get("httpMethod");
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> requestContext = (Map<String, Object>) request.get("requestContext");
+		Map<String, Object> http = (Map<String, Object>) requestContext.get("http");
+		String method = (String) http.get("method");
+		String path = (String) http.get("path");
 
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", "application/json");
