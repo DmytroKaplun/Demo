@@ -50,19 +50,27 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		String path = (String) request.get("path");
 		String method = (String) request.get("httpMethod");
 
-		String functionName = context.getFunctionName(); // e.g., cmtr-3jp7qfiy-api_handler
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Content-Type", "application/json");
+		headers.put("Access-Control-Allow-Origin", "*");
 
+//		String functionName = context.getFunctionName(); // e.g., cmtr-3jp7qfiy-api_handler
 		// Dynamically construct the expected base path from the Lambda function's name
-		String dynamicBasePath = functionName.split("-")[0] + "-" + functionName.split("-")[1]; // Extract "cmtr-3jp7qfiy"
-		String expectedPath = "/" + dynamicBasePath;
+//		String dynamicBasePath = functionName.split("-")[0] + "-" + functionName.split("-")[1]; // Extract "cmtr-3jp7qfiy"
+//		String expectedPath = "/" + dynamicBasePath;
 
 
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
-			response.put("statusCode", 400);
-			response.put("message", String.format(
+			Map<String, Object> body = new HashMap<>();
+			body.put("statusCode", 400);
+			body.put("message", String.format(
 					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
-					expectedPath, method
+					path, method
 			));
+
+			response.put("statusCode", 400);
+			response.put("headers", headers);
+			response.put("body", body);
 			return response;
 		}
 		Map<String, Object> orderedWeatherData = new LinkedHashMap<>();
@@ -111,14 +119,15 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			Map<String, Object> currentWeather = (Map<String, Object>) weatherData.get("current");
 			orderedWeatherData.put("current", currentWeather);
 
-
 		} catch (Exception e) {
 			// In case of an error, return an error response
 			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
 
-		// Return the ordered weather data
-		return orderedWeatherData;
+		response.put("statusCode", 200); // HTTP status code
+		response.put("headers", headers); // Headers
+		response.put("body", orderedWeatherData);
+		return response;
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
