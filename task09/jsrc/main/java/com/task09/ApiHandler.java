@@ -45,25 +45,25 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		this.openMeteoApiClient = new OpenMeteoApiClient();
 	}
 
+	@Override
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
+		// Use LinkedHashMap to preserve field order in the top-level response
 		Map<String, Object> response = new LinkedHashMap<>();
+
+		// Extract request context and HTTP details
 		Map<String, Object> requestContext = (Map<String, Object>) request.get("requestContext");
 		Map<String, Object> http = (Map<String, Object>) requestContext.get("http");
 		String method = (String) http.get("method");
 		String path = (String) http.get("path");
 
-		Map<String, String> headers = new HashMap<>();
+		// Use LinkedHashMap for headers to maintain order
+		Map<String, String> headers = new LinkedHashMap<>();
 		headers.put("Content-Type", "application/json");
 		headers.put("Access-Control-Allow-Origin", "*");
 
-//		String functionName = context.getFunctionName(); // e.g., cmtr-3jp7qfiy-api_handler
-		// Dynamically construct the expected base path from the Lambda function's name
-//		String dynamicBasePath = functionName.split("-")[0] + "-" + functionName.split("-")[1]; // Extract "cmtr-3jp7qfiy"
-//		String expectedPath = "/" + dynamicBasePath;
-
-
+		// Validate HTTP method and path
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
-			Map<String, Object> body = new HashMap<>();
+			Map<String, Object> body = new LinkedHashMap<>();
 			body.put("statusCode", 400);
 			body.put("message", String.format(
 					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
@@ -75,6 +75,8 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			response.put("body", body);
 			return response;
 		}
+
+		// Use LinkedHashMap for ordered weather data
 		Map<String, Object> orderedWeatherData = new LinkedHashMap<>();
 		try {
 			// Extract query parameters
@@ -85,6 +87,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			// Fetch weather data from Open-Meteo API
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast(latitude, longitude);
 
+			// Add fields in the specified order
 			orderedWeatherData.put("latitude", latitude);
 			orderedWeatherData.put("longitude", longitude);
 			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
@@ -93,6 +96,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("timezone_abbreviation", "EET");
 			orderedWeatherData.put("elevation", weatherData.get("elevation"));
 
+			// Add hourly_units
 			Map<String, Object> hourlyUnits = new LinkedHashMap<>();
 			hourlyUnits.put("time", "iso8601");
 			hourlyUnits.put("temperature_2m", "°C");
@@ -100,7 +104,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			hourlyUnits.put("wind_speed_10m", "km/h");
 			orderedWeatherData.put("hourly_units", hourlyUnits);
 
-			// Add "hourly" with truncated data
+			// Add hourly with truncated data
 			Map<String, Object> hourlyData = (Map<String, Object>) weatherData.get("hourly");
 			Map<String, Object> truncatedHourlyData = new LinkedHashMap<>();
 			truncatedHourlyData.put("time", truncateWithEllipsis((List<String>) hourlyData.get("time"), 3));
@@ -109,27 +113,28 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			truncatedHourlyData.put("wind_speed_10m", truncateWithEllipsis((List<Double>) hourlyData.get("wind_speed_10m"), 3));
 			orderedWeatherData.put("hourly", truncatedHourlyData);
 
-			// Add "current_units"
+			// Add current_units
 			Map<String, Object> currentUnits = new LinkedHashMap<>();
-			currentUnits.put("wind_speed_10m", "km/h");
-			currentUnits.put("temperature_2m", "°C");
-			currentUnits.put("interval", "seconds");
 			currentUnits.put("time", "iso8601");
+			currentUnits.put("interval", "seconds");
+			currentUnits.put("temperature_2m", "°C");
+			currentUnits.put("wind_speed_10m", "km/h");
 			orderedWeatherData.put("current_units", currentUnits);
 
-			// Add "current"
+			// Add current weather
 			Map<String, Object> currentWeather = (Map<String, Object>) weatherData.get("current");
 			orderedWeatherData.put("current", currentWeather);
 
 		} catch (Exception e) {
-			// In case of an error, return an error response
+			// Handle exceptions
 			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
 
+		// Add orderedWeatherData to the response
 		response.put("statusCode", 200); // HTTP status code
-		response.put("headers", headers); // Headers
+		response.put("headers", headers);
 		response.put("body", orderedWeatherData);
-		return response;
+		return response; // Return the LinkedHashMap response
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
