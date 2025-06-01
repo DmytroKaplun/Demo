@@ -48,21 +48,17 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 
 	@Override
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
-		// Use LinkedHashMap to preserve field order in the top-level response
+		// Use LinkedHashMap to preserve field order
 		Map<String, Object> response = new LinkedHashMap<>();
-
-		// Extract request context and HTTP details
 		Map<String, Object> requestContext = (Map<String, Object>) request.get("requestContext");
 		Map<String, Object> http = (Map<String, Object>) requestContext.get("http");
 		String method = (String) http.get("method");
 		String path = (String) http.get("path");
 
-		// Use LinkedHashMap for headers to maintain order
 		Map<String, String> headers = new LinkedHashMap<>();
 		headers.put("Content-Type", "application/json");
 		headers.put("Access-Control-Allow-Origin", "*");
 
-		// Validate HTTP method and path
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
 			Map<String, Object> body = new LinkedHashMap<>();
 			body.put("statusCode", 400);
@@ -77,7 +73,6 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			return response;
 		}
 
-		// Use LinkedHashMap for ordered weather data
 		Map<String, Object> orderedWeatherData = new LinkedHashMap<>();
 		try {
 			// Extract query parameters
@@ -92,7 +87,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("latitude", latitude);
 			orderedWeatherData.put("longitude", longitude);
 			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
-			orderedWeatherData.put("utc_offset_seconds", 7200); // Explicitly set timezone offset
+			orderedWeatherData.put("utc_offset_seconds", 7200);
 			orderedWeatherData.put("timezone", "Europe/Kiev");
 			orderedWeatherData.put("timezone_abbreviation", "EET");
 			orderedWeatherData.put("elevation", weatherData.get("elevation"));
@@ -131,14 +126,20 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
 
-		Gson gson = new Gson();
-		String jsonResponse = gson.toJson(orderedWeatherData);
-
-		// Add orderedWeatherData to the response
-		response.put("statusCode", 200); // HTTP status code
+		response.put("statusCode", 200);
 		response.put("headers", headers);
-		response.put("body", jsonResponse);
-		return response; // Return the LinkedHashMap response
+		response.put("body", orderedWeatherData);
+
+		// Serialize the response into JSON
+		Gson gson = new Gson();
+		String jsonResponse = gson.toJson(response);
+
+		// Return the serialized response as a map
+		Map<String, Object> finalResponse = new LinkedHashMap<>();
+		finalResponse.put("statusCode", 200);
+		finalResponse.put("headers", headers);
+		finalResponse.put("body", jsonResponse);
+		return finalResponse;
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
