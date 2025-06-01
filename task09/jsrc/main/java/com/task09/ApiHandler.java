@@ -12,7 +12,11 @@ import com.syndicate.deployment.model.RetentionSetting;
 import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
 import org.example.weather.OpenMeteoApiClient;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @LambdaHandler(
@@ -47,27 +51,75 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		String method = (String) request.get("httpMethod");
 
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
-			// Return 400 Bad Request for unsupported paths or methods
 			response.put("statusCode", 400);
-			response.put("body", String.format("{\"statusCode\": 400, \"message\": \"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s\"}", path, method));
+			response.put("message", String.format(
+					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
+					path, method
+			));
 			return response;
 		}
-
+		Map<String, Object> orderedWeatherData = new LinkedHashMap<>();
 		try {
-			// Retrieve latitude and longitude from query parameters
+			// Extract query parameters
 			Map<String, String> queryParams = (Map<String, String>) request.get("queryStringParameters");
 			double latitude = Double.parseDouble(queryParams.get("latitude"));
 			double longitude = Double.parseDouble(queryParams.get("longitude"));
 
-			// Fetch weather data using the SDK
+			// Fetch weather data from Open-Meteo API
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast(latitude, longitude);
-			response.put("statusCode", 200);
-			response.put("body", weatherData);
+
+			orderedWeatherData.put("latitude", latitude);
+			orderedWeatherData.put("longitude", longitude);
+			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
+			orderedWeatherData.put("utc_offset_seconds", 7200); // Explicitly set timezone offset
+			orderedWeatherData.put("timezone", "Europe/Kiev");
+			orderedWeatherData.put("timezone_abbreviation", "EET");
+			orderedWeatherData.put("elevation", weatherData.get("elevation"));
+
+			Map<String, Object> hourlyUnits = new LinkedHashMap<>();
+			hourlyUnits.put("wind_speed_10m", "km/h");
+			hourlyUnits.put("temperature_2m", "°C");
+			hourlyUnits.put("relative_humidity_2m", "%");
+			hourlyUnits.put("time", "iso8601");
+			orderedWeatherData.put("hourly_units", hourlyUnits);
+
+			// Add "hourly" with truncated data
+			Map<String, Object> hourlyData = (Map<String, Object>) weatherData.get("hourly");
+			Map<String, Object> truncatedHourlyData = new LinkedHashMap<>();
+			truncatedHourlyData.put("time", truncateWithEllipsis((List<String>) hourlyData.get("time"), 3));
+			truncatedHourlyData.put("temperature_2m", truncateWithEllipsis((List<Double>) hourlyData.get("temperature_2m"), 3));
+			truncatedHourlyData.put("relative_humidity_2m", truncateWithEllipsis((List<Integer>) hourlyData.get("relative_humidity_2m"), 3));
+			truncatedHourlyData.put("wind_speed_10m", truncateWithEllipsis((List<Double>) hourlyData.get("wind_speed_10m"), 3));
+			orderedWeatherData.put("hourly", truncatedHourlyData);
+
+			// Add "current_units"
+			Map<String, Object> currentUnits = new LinkedHashMap<>();
+			currentUnits.put("wind_speed_10m", "km/h");
+			currentUnits.put("temperature_2m", "°C");
+			currentUnits.put("interval", "seconds");
+			currentUnits.put("time", "iso8601");
+			orderedWeatherData.put("current_units", currentUnits);
+
+			// Add "current"
+			Map<String, Object> currentWeather = (Map<String, Object>) weatherData.get("current");
+			orderedWeatherData.put("current", currentWeather);
+
+
 		} catch (Exception e) {
-			// Handle errors gracefully
-			response.put("statusCode", 500);
-			response.put("body", String.format("{\"statusCode\": 500, \"message\": \"Internal server error. Error: %s\"}", e.getMessage()));
+			// In case of an error, return an error response
+			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
-		return response;
+
+		// Return the ordered weather data
+		return orderedWeatherData;
+	}
+
+	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
+		List<Object> truncatedList = new ArrayList<>();
+		for (int i = 0; i < Math.min(limit, originalList.size()); i++) {
+			truncatedList.add(originalList.get(i));
+		}
+		truncatedList.add("...");
+		return truncatedList;
 	}
 }
