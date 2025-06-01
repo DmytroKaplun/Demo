@@ -2,6 +2,7 @@ package com.task09;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.google.gson.Gson;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.annotations.lambda.LambdaLayer;
 import com.syndicate.deployment.annotations.lambda.LambdaUrlConfig;
@@ -130,10 +131,13 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
 
+		Gson gson = new Gson();
+		String jsonResponse = gson.toJson(orderedWeatherData);
+
 		// Add orderedWeatherData to the response
 		response.put("statusCode", 200); // HTTP status code
 		response.put("headers", headers);
-		response.put("body", orderedWeatherData);
+		response.put("body", jsonResponse);
 		return response; // Return the LinkedHashMap response
 	}
 
