@@ -46,7 +46,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 	}
 
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
-		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new LinkedHashMap<>();
 		String path = (String) request.get("path");
 		String method = (String) request.get("httpMethod");
 
@@ -75,10 +75,6 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			// Fetch weather data from Open-Meteo API
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast(latitude, longitude);
 
-//			orderedWeatherData.put("message", String.format(
-//					"Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
-//					path, method
-//			));
 			orderedWeatherData.put("latitude", latitude);
 			orderedWeatherData.put("longitude", longitude);
 			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
