@@ -129,7 +129,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		response.put("statusCode", 200); // HTTP status code
 		response.put("headers", headers); // Headers
 		response.put("body", orderedWeatherData);
-		return response;
+		return orderedWeatherData;
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
