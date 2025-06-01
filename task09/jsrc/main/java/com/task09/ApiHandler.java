@@ -46,7 +46,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 	}
 
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
-		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new LinkedHashMap<>();
 		Map<String, Object> requestContext = (Map<String, Object>) request.get("requestContext");
 		Map<String, Object> http = (Map<String, Object>) requestContext.get("http");
 		String method = (String) http.get("method");
@@ -129,7 +129,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		response.put("statusCode", 200); // HTTP status code
 		response.put("headers", headers); // Headers
 		response.put("body", orderedWeatherData);
-		return orderedWeatherData;
+		return response;
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
