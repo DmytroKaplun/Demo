@@ -77,10 +77,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("elevation", weatherData.get("elevation"));
 
 			Map<String, Object> hourlyUnits = new LinkedHashMap<>();
-			hourlyUnits.put("wind_speed_10m", "km/h");
+			hourlyUnits.put("time", "iso8601");
 			hourlyUnits.put("temperature_2m", "°C");
 			hourlyUnits.put("relative_humidity_2m", "%");
-			hourlyUnits.put("time", "iso8601");
+			hourlyUnits.put("wind_speed_10m", "km/h");
 			orderedWeatherData.put("hourly_units", hourlyUnits);
 
 			// Add "hourly" with truncated data
