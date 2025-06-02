@@ -71,10 +71,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 					path, method
 			));
 
-			response.put("statusCode", 400);
-			response.put("headers", headers);
-			response.put("body", body);
-			return response;
+//			response.put("statusCode", 400);
+//			response.put("headers", headers);
+//			response.put("body", body);
+			return body;
 		}
 
 		// Use LinkedHashMap for ordered weather data
