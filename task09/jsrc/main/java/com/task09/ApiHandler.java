@@ -71,10 +71,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 					path, method
 			));
 
-//			response.put("statusCode", 400);
-//			response.put("headers", headers);
-//			response.put("body", body);
-			return body;
+			response.put("statusCode", 400);
+			response.put("headers", headers);
+			response.put("body", body);
+			return response;
 		}
 
 		// Use LinkedHashMap for ordered weather data
@@ -134,7 +134,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		Gson gson = new Gson();
 		String jsonResponse = gson.toJson(orderedWeatherData);
 		response.put("statusCode", 200); // HTTP status code
-		response.put("response", jsonResponse);
+		response.put("response", orderedWeatherData);
 
 		Map<String, Object> finalResponse = new LinkedHashMap<>();
 		finalResponse.put("statusCode", 200);
