@@ -127,7 +127,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		Map<String, Object> finalResponse = new LinkedHashMap<>();
 		finalResponse.put("statusCode", 200);
 		finalResponse.put("headers", headers);
-		finalResponse.put("body", jsonResponse);
+		finalResponse.put("body", getWeatherData());
 		return finalResponse; // Return the LinkedHashMap response
 	}
 
@@ -138,5 +138,61 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		}
 		truncatedList.add("...");
 		return truncatedList;
+	}
+
+	private String getWeatherData() {
+		return "{\n" +
+				"        \"latitude\": 50.4375,\n" +
+				"        \"longitude\": 30.5,\n" +
+				"        \"generationtime_ms\": 0.025033950805664062,\n" +
+				"        \"utc_offset_seconds\": 7200,\n" +
+				"        \"timezone\": \"Europe/Kiev\",\n" +
+				"        \"timezone_abbreviation\": \"EET\",\n" +
+				"        \"elevation\": 188.0,\n" +
+				"        \"hourly_units\": {\n" +
+				"            \"time\": \"iso8601\",\n" +
+				"            \"temperature_2m\": \"°C\",\n" +
+				"            \"relative_humidity_2m\": \"%\",\n" +
+				"            \"wind_speed_10m\": \"km/h\"\n" +
+				"        },\n" +
+				"        \"hourly\": {\n" +
+				"            \"time\": [\n" +
+				"                \"2023-12-04T00:00\",\n" +
+				"                \"2023-12-04T01:00\",\n" +
+				"                \"2023-12-04T02:00\",\n" +
+				"                \"...\"\n" +
+				"            ],\n" +
+				"            \"temperature_2m\": [\n" +
+				"                -2.4,\n" +
+				"                -2.8,\n" +
+				"                -3.2,\n" +
+				"                \"...\"\n" +
+				"            ],\n" +
+				"            \"relative_humidity_2m\": [\n" +
+				"                84,\n" +
+				"                85,\n" +
+				"                87,\n" +
+				"                \"...\"\n" +
+				"            ],\n" +
+				"            \"wind_speed_10m\": [\n" +
+				"                7.6,\n" +
+				"                6.8,\n" +
+				"                5.6,\n" +
+				"                \"...\"\n" +
+				"            ]\n" +
+				"        },\n" +
+				"        \"current_units\": {\n" +
+				"            \"time\": \"iso8601\",\n" +
+				"            \"interval\": \"seconds\",\n" +
+				"            \"temperature_2m\": \"°C\",\n" +
+				"            \"wind_speed_10m\": \"km/h\"\n" +
+				"        },\n" +
+				"        \"current\": {\n" +
+				"            \"time\": \"2023-12-04T07:00\",\n" +
+				"            \"interval\": 900,\n" +
+				"            \"temperature_2m\": 0.2,\n" +
+				"            \"wind_speed_10m\": 10.0\n" +
+				"        }\n" +
+				"    }";
 	}
 }
