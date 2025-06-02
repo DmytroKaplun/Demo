@@ -15,7 +15,8 @@ import com.syndicate.deployment.model.lambda.url.InvokeMode;
 import org.example.weather.OpenMeteoApiClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,6 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 
 		Map<String, String> headers = new LinkedHashMap<>();
 		headers.put("Content-Type", "application/json");
-		headers.put("Access-Control-Allow-Origin", "*");
 
 		// Validate HTTP method and path
 		if (!"/weather".equals(path) || !"GET".equalsIgnoreCase(method)) {
@@ -78,8 +78,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		try {
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast();
 
-			double latitude = Double.parseDouble(String.format("%.4f", weatherData.get("latitude")));
-			double longitude = Double.parseDouble(String.format("%.1f", weatherData.get("longitude")));
+			double latitude = Double.parseDouble(String.format("%.4f", Double.parseDouble(weatherData.get("latitude").toString())));
+			double longitude = Double.parseDouble(String.format("%.1f", Double.parseDouble(weatherData.get("longitude").toString())));
+
+
 			orderedWeatherData.put("latitude", latitude);
 			orderedWeatherData.put("longitude", longitude);
 			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
@@ -99,10 +101,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			// Add hourly with truncated data
 			Map<String, Object> hourlyData = (Map<String, Object>) weatherData.get("hourly");
 			Map<String, Object> truncatedHourlyData = new LinkedHashMap<>();
-			truncatedHourlyData.put("time", truncateWithEllipsis((List<String>) hourlyData.get("time"), 3));
-			truncatedHourlyData.put("temperature_2m", truncateWithEllipsis((List<Double>) hourlyData.get("temperature_2m"), 3));
-			truncatedHourlyData.put("relative_humidity_2m", truncateWithEllipsis((List<Integer>) hourlyData.get("relative_humidity_2m"), 3));
-			truncatedHourlyData.put("wind_speed_10m", truncateWithEllipsis((List<Double>) hourlyData.get("wind_speed_10m"), 3));
+			truncatedHourlyData.put("time", (List<String>) hourlyData.get("time"));
+			truncatedHourlyData.put("temperature_2m", (List<Double>) hourlyData.get("temperature_2m"));
+			truncatedHourlyData.put("relative_humidity_2m", (List<Integer>) hourlyData.get("relative_humidity_2m"));
+			truncatedHourlyData.put("wind_speed_10m", (List<Double>) hourlyData.get("wind_speed_10m"));
 			orderedWeatherData.put("hourly", truncatedHourlyData);
 
 			// Add current_units
@@ -124,13 +126,13 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		Gson gson = new Gson();
 		String jsonResponse = gson.toJson(orderedWeatherData);
 //		response.put("statusCode", 200); // HTTP status code
-		response.put("response", orderedWeatherData);
+//		response.put("response", orderedWeatherData);
 
 		Map<String, Object> finalResponse = new LinkedHashMap<>();
 		finalResponse.put("statusCode", 200);
 		finalResponse.put("headers", headers);
 		finalResponse.put("body", jsonResponse);
-		return finalResponse; // Return the LinkedHashMap response
+		return finalResponse;
 	}
 
 	private List<Object> truncateWithEllipsis(List<?> originalList, int limit) {
