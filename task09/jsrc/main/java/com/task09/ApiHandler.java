@@ -89,21 +89,21 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			Map<String, Object> weatherData = openMeteoApiClient.getWeatherForecast(latitude, longitude);
 
 			// Add fields in the specified order
-			orderedWeatherData.put("latitude", latitude);
-			orderedWeatherData.put("longitude", longitude);
-			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
-			orderedWeatherData.put("utc_offset_seconds", 7200); // Explicitly set timezone offset
-			orderedWeatherData.put("timezone", "Europe/Kiev");
-			orderedWeatherData.put("timezone_abbreviation", "EET");
-			orderedWeatherData.put("elevation", weatherData.get("elevation"));
+//			orderedWeatherData.put("latitude", latitude);
+//			orderedWeatherData.put("longitude", longitude);
+//			orderedWeatherData.put("generationtime_ms", weatherData.get("generationtime_ms"));
+//			orderedWeatherData.put("utc_offset_seconds", 7200); // Explicitly set timezone offset
+//			orderedWeatherData.put("timezone", "Europe/Kiev");
+//			orderedWeatherData.put("timezone_abbreviation", "EET");
+//			orderedWeatherData.put("elevation", weatherData.get("elevation"));
 
 			// Add hourly_units
-			Map<String, Object> hourlyUnits = new LinkedHashMap<>();
-			hourlyUnits.put("time", "iso8601");
-			hourlyUnits.put("temperature_2m", "°C");
-			hourlyUnits.put("relative_humidity_2m", "%");
-			hourlyUnits.put("wind_speed_10m", "km/h");
-			orderedWeatherData.put("hourly_units", hourlyUnits);
+//			Map<String, Object> hourlyUnits = new LinkedHashMap<>();
+//			hourlyUnits.put("time", "iso8601");
+//			hourlyUnits.put("temperature_2m", "°C");
+//			hourlyUnits.put("relative_humidity_2m", "%");
+//			hourlyUnits.put("wind_speed_10m", "km/h");
+//			orderedWeatherData.put("hourly_units", hourlyUnits);
 
 			// Add hourly with truncated data
 			Map<String, Object> hourlyData = (Map<String, Object>) weatherData.get("hourly");
@@ -115,16 +115,16 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("hourly", truncatedHourlyData);
 
 			// Add current_units
-			Map<String, Object> currentUnits = new LinkedHashMap<>();
-			currentUnits.put("time", "iso8601");
-			currentUnits.put("interval", "seconds");
-			currentUnits.put("temperature_2m", "°C");
-			currentUnits.put("wind_speed_10m", "km/h");
-			orderedWeatherData.put("current_units", currentUnits);
+//			Map<String, Object> currentUnits = new LinkedHashMap<>();
+//			currentUnits.put("time", "iso8601");
+//			currentUnits.put("interval", "seconds");
+//			currentUnits.put("temperature_2m", "°C");
+//			currentUnits.put("wind_speed_10m", "km/h");
+//			orderedWeatherData.put("current_units", currentUnits);
 
 			// Add current weather
-			Map<String, Object> currentWeather = (Map<String, Object>) weatherData.get("current");
-			orderedWeatherData.put("current", currentWeather);
+//			Map<String, Object> currentWeather = (Map<String, Object>) weatherData.get("current");
+//			orderedWeatherData.put("current", currentWeather);
 
 		} catch (Exception e) {
 			// Handle exceptions
@@ -134,10 +134,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		Gson gson = new Gson();
 		String jsonResponse = gson.toJson(orderedWeatherData);
 //		response.put("statusCode", 200); // HTTP status code
-//		response.put("response", orderedWeatherData);
+//		response.put("message", orderedWeatherData);
 
 		Map<String, Object> finalResponse = new LinkedHashMap<>();
-		finalResponse.put("statusCode", 200);
+		finalResponse.put("statusCode", 201);
 		finalResponse.put("headers", headers);
 		finalResponse.put("body", jsonResponse);
 		return finalResponse; // Return the LinkedHashMap response
@@ -148,7 +148,7 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 		for (int i = 0; i < Math.min(limit, originalList.size()); i++) {
 			truncatedList.add(originalList.get(i));
 		}
-//		truncatedList.add("...");
+		truncatedList.add("...");
 		return truncatedList;
 	}
 }
