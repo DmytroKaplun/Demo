@@ -108,10 +108,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			// Add hourly with truncated data
 			Map<String, Object> hourlyData = (Map<String, Object>) weatherData.get("hourly");
 			Map<String, Object> truncatedHourlyData = new LinkedHashMap<>();
-			truncatedHourlyData.put("time", truncateWithEllipsis((List<String>) hourlyData.get("time"), 3));
-			truncatedHourlyData.put("temperature_2m", truncateWithEllipsis((List<Double>) hourlyData.get("temperature_2m"), 3));
-			truncatedHourlyData.put("relative_humidity_2m", truncateWithEllipsis((List<Integer>) hourlyData.get("relative_humidity_2m"), 3));
-			truncatedHourlyData.put("wind_speed_10m", truncateWithEllipsis((List<Double>) hourlyData.get("wind_speed_10m"), 3));
+			truncatedHourlyData.put("time", (List<String>) hourlyData.get("time"));
+			truncatedHourlyData.put("temperature_2m", (List<Double>) hourlyData.get("temperature_2m"));
+			truncatedHourlyData.put("relative_humidity_2m", (List<Integer>) hourlyData.get("relative_humidity_2m"));
+			truncatedHourlyData.put("wind_speed_10m", (List<Double>) hourlyData.get("wind_speed_10m"));
 			orderedWeatherData.put("hourly", truncatedHourlyData);
 
 			// Add current_units
