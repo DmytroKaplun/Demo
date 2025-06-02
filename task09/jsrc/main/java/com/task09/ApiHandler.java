@@ -13,10 +13,7 @@ import com.syndicate.deployment.model.RetentionSetting;
 import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
 import org.example.weather.OpenMeteoApiClient;
-
 import java.util.ArrayList;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
