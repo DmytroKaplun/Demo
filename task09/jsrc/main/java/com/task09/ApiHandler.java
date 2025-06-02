@@ -131,15 +131,15 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
 			orderedWeatherData.put("message", String.format("Error: %s", e.getMessage()));
 		}
 
-//		Gson gson = new Gson();
-//		String jsonResponse = gson.toJson(orderedWeatherData);
+		Gson gson = new Gson();
+		String jsonResponse = gson.toJson(orderedWeatherData);
 //		response.put("statusCode", 200); // HTTP status code
-		response.put("response", orderedWeatherData);
+		response.put("response", jsonResponse);
 
-		Map<String, Object> finalResponse = new LinkedHashMap<>();
-		finalResponse.put("statusCode", 200);
-		finalResponse.put("headers", headers);
-		finalResponse.put("body", response);
+//		Map<String, Object> finalResponse = new LinkedHashMap<>();
+//		finalResponse.put("statusCode", 200);
+//		finalResponse.put("headers", headers);
+//		finalResponse.put("body", response);
 		return response; // Return the LinkedHashMap response
 	}
 
