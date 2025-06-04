@@ -33,7 +33,7 @@ public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEv
 
 
             Item item = new Item()
-                .withPrimaryKey("id", requestBody.getInt("id"))
+                .withPrimaryKey("id", String.valueOf(requestBody.getInt("id")))
                 .withNumber("number", requestBody.getInt("number"))
                 .withNumber("places", requestBody.getInt("places"))
                 .withBoolean("isVip", requestBody.getBoolean("isVip"));
