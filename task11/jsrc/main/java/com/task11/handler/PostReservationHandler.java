@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PostReservationHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private static final String TABLE_NAME = "TABLE_NAME_2";
+    private static final String TABLE_NAME = "reservations_table";
     private static final String REGION = "REGION";
     private final AmazonDynamoDB dynamoDbClient;
     private final DynamoDB dynamoDB;

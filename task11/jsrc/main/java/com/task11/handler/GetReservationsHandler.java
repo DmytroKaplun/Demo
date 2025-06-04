@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class GetReservationsHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final AmazonDynamoDB dynamoDbClient;
-    private static final String TABLE_NAME = "TABLE_NAME_2";
+    private static final String TABLE_NAME = "reservations_table";
     private static final String REGION = "REGION";
 
     public GetReservationsHandler() {

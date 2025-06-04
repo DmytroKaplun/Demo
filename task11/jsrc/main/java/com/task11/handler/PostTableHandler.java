@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private static final String TABLE_NAME = "TABLE_NAME_1";
+    private static final String TABLE_NAME = "tables_table";
     private static final String REGION = "REGION";
     private final AmazonDynamoDB dynamoDbClient;
     private final DynamoDB dynamoDB;
