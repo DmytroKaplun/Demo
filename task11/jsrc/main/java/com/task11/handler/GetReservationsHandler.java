@@ -9,9 +9,14 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class GetReservationsHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -30,21 +35,26 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
                     .withTableName(getTableName())
                     .withLimit(100));
 
-            JSONArray tables = new JSONArray();
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Map<String, Object>> tablesList = new ArrayList<>();
+
             scanResponse.getItems().forEach(item -> {
-                JSONObject table = new JSONObject();
+                Map<String, Object> table = new LinkedHashMap<>();
                 table.put("tableNumber", item.get("tableNumber").getN());
                 table.put("clientName", item.get("clientName").getS());
                 table.put("phoneNumber", item.get("phoneNumber").getS());
                 table.put("date", item.get("date").getS());
                 table.put("slotTimeStart", item.get("slotTimeStart").getS());
                 table.put("slotTimeEnd", item.get("slotTimeEnd").getS());
-                tables.put(table);
+                tablesList.add(table);
             });
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("reservations", tablesList);
 
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(200)
-                    .withBody(new JSONObject().put("reservations", tables).toString());
+                    .withBody(objectMapper.writeValueAsString(response));
         } catch (Exception e) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)

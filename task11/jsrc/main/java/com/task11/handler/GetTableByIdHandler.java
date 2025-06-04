@@ -9,8 +9,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,17 +39,21 @@ public class GetTableByIdHandler implements RequestHandler<APIGatewayProxyReques
                     getTableName(),
                     Map.of("id", new AttributeValue(tableId))
             );
+            ObjectMapper objectMapper = new ObjectMapper();
             Map<String, AttributeValue> item = itemResult.getItem();
 
-            JSONObject itemJsonObject = new JSONObject()
-                    .put("id", item.get("id").getS())
-                    .put("number", Integer.parseInt(item.get("number").getN()))
-                    .put("places", Integer.parseInt(item.get("places").getN()))
-                    .put("isVip", item.get("isVip").getBOOL());
+            Map<String, Object> table = new LinkedHashMap<>();
+            table.put("id", Integer.parseInt(item.get("id").getS())); // Convert `id` to Integer
+            table.put("number", Integer.parseInt(item.get("number").getN())); // Convert `number` to Integer
+            table.put("places", Integer.parseInt(item.get("places").getN())); // Convert `places` to Integer
+            table.put("isVip", item.get("isVip").getBOOL()); // Boolean
+            if (item.containsKey("minOrder")) {
+                table.put("minOrder", Integer.parseInt(item.get("minOrder").getN()));
+            }
 
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(200)
-                    .withBody(itemJsonObject.toString());
+                    .withBody(objectMapper.writeValueAsString(table));
         } catch (Exception e) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)

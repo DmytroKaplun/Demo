@@ -11,6 +11,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
@@ -20,6 +22,7 @@ import org.json.JSONObject;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -49,18 +52,18 @@ public class PostReservationHandler implements RequestHandler<APIGatewayProxyReq
             String slotTimeStart = requestBody.getString("slotTimeStart");
             String slotTimeEnd = requestBody.getString("slotTimeEnd");
 
-            if (!doesTableExist(tableNumber)) {
-                throw new IllegalArgumentException("Table not found.");
-            }
-
-            if (hasConflictingReservation(tableNumber, date, slotTimeStart, slotTimeEnd)) {
-                throw new IllegalArgumentException("Conflicting reservation exists for the given table and time slot.");
-            }
+//            if (!doesTableExist(tableNumber)) {
+//                throw new IllegalArgumentException("Table not found.");
+//            }
+//
+//            if (hasConflictingReservation(tableNumber, date, slotTimeStart, slotTimeEnd)) {
+//                throw new IllegalArgumentException("Conflicting reservation exists for the given table and time slot.");
+//            }
 
             String reservationId = UUID.randomUUID().toString();
 
             saveEventToDynamoDB(new Item()
-                    .withPrimaryKey("id", reservationId )
+                    .withPrimaryKey("id",reservationId)
                     .withNumber("tableNumber", tableNumber)
                     .withString("clientName", clientName)
                     .withString("phoneNumber", phoneNumber)
@@ -72,6 +75,7 @@ public class PostReservationHandler implements RequestHandler<APIGatewayProxyReq
                     .withStatusCode(200)
                     .withBody(new JSONObject().put("reservationId", reservationId).toString());
         } catch (Exception e) {
+            context.getLogger().log("Error: " + e.getMessage());
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
                     .withBody(new JSONObject().put("error", e.getMessage()).toString());
@@ -141,52 +145,58 @@ public class PostReservationHandler implements RequestHandler<APIGatewayProxyReq
         }
     }
 
-    private boolean doesTableExist(int tableNumber) {
-        GetItemResult getItemResponse = dynamoDbClient.getItem(
-                getTableName(),
-                Map.of("number", new AttributeValue(String.valueOf(tableNumber)))
-        );
-        return getItemResponse.getItem() != null;
-    }
+//    private boolean doesTableExist(int tableNumber) {
+//        try {
+//            // Use a Scan operation to check if `number` exists in the table
+//            ScanRequest scanRequest = new ScanRequest()
+//                    .withTableName(getTableName())
+//                    .withFilterExpression("number = :tableNumber")
+//                    .withExpressionAttributeValues(Map.of(":tableNumber", new AttributeValue().withN(String.valueOf(tableNumber))));
+//
+//            ScanResult scanResult = dynamoDbClient.scan(scanRequest);
+//
+//            // Return true if any item matches the filter
+//            return !scanResult.getItems().isEmpty();
+//        } catch (AmazonDynamoDBException e) {
+//            throw new RuntimeException("Failed to check if the table exists", e);
+//        }
+//    }
 
-private boolean hasConflictingReservation(int tableNumber, String date, String slotTimeStart, String slotTimeEnd) {
-    try {
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":tableNumber", new AttributeValue().withN(String.valueOf(tableNumber)));
-        expressionAttributeValues.put(":date", new AttributeValue().withS(date));
-
-        Map<String, String> expressionAttributeNames = new HashMap<>();
-        expressionAttributeNames.put("#date", "date");
-
-        QueryRequest queryRequest = new QueryRequest()
-                .withTableName(getTableName())
-                .withKeyConditionExpression("tableNumber = :tableNumber and #date = :date")
-                .withExpressionAttributeNames(expressionAttributeNames)
-                .withExpressionAttributeValues(expressionAttributeValues);
-
-        QueryResult queryResult = dynamoDbClient.query(queryRequest);
-
-        for (Map<String, AttributeValue> reservation : queryResult.getItems()) {
-            String existingStart = reservation.get("slotTimeStart").getS();
-            String existingEnd = reservation.get("slotTimeEnd").getS();
-
-            if (timeSlotsOverlap(slotTimeStart, slotTimeEnd, existingStart, existingEnd)) {
-                return true;
-            }
-        }
-
-        return false;
-    } catch (AmazonDynamoDBException e) {
-        throw new RuntimeException("Failed to check for conflicting reservations", e);
-    }
-}
+//private boolean hasConflictingReservation(int tableNumber, String date, String slotTimeStart, String slotTimeEnd) {
+//    try {
+//        ScanRequest scanRequest = new ScanRequest()
+//                .withTableName(getTableName())
+//                .withFilterExpression("tableNumber = :tableNumber and reservationDate = :date")
+//                .withExpressionAttributeValues(Map.of(
+//                        ":tableNumber", new AttributeValue().withN(String.valueOf(tableNumber)),
+//                        ":date", new AttributeValue().withS(date)
+//                ));
+//
+//        ScanResult scanResult = dynamoDbClient.scan(scanRequest);
+//
+//        for (Map<String, AttributeValue> reservation : scanResult.getItems()) {
+//            String existingStart = reservation.get("slotTimeStart").getS();
+//            String existingEnd = reservation.get("slotTimeEnd").getS();
+//
+//            if (timeSlotsOverlap(slotTimeStart, slotTimeEnd, existingStart, existingEnd)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    } catch (AmazonDynamoDBException e) {
+//        throw new RuntimeException("Failed to check for conflicting reservations", e);
+//    }
+//}
 
     private boolean timeSlotsOverlap(String start1, String end1, String start2, String end2) {
-        LocalTime startTime1 = LocalTime.parse(start1, DateTimeFormatter.ofPattern("HH:mm"));
-        LocalTime endTime1 = LocalTime.parse(end1, DateTimeFormatter.ofPattern("HH:mm"));
-        LocalTime startTime2 = LocalTime.parse(start2, DateTimeFormatter.ofPattern("HH:mm"));
-        LocalTime endTime2 = LocalTime.parse(end2, DateTimeFormatter.ofPattern("HH:mm"));
-
-        return !(endTime1.isBefore(startTime2) || startTime1.isAfter(endTime2));
+        try {
+            LocalTime startTime1 = LocalTime.parse(start1, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime1 = LocalTime.parse(end1, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime startTime2 = LocalTime.parse(start2, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime2 = LocalTime.parse(end2, DateTimeFormatter.ofPattern("HH:mm"));
+            return !(endTime1.isBefore(startTime2) || startTime1.isAfter(endTime2));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid time format provided", e);
+        }
     }
 }

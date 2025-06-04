@@ -11,6 +11,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class GetTablesHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -29,26 +35,27 @@ public class GetTablesHandler implements RequestHandler<APIGatewayProxyRequestEv
                     .withTableName(getTableName())
                     .withLimit(100));
 
-            JSONArray tables = new JSONArray();
-            scanResponse.getItems().forEach(item -> {
-                JSONObject table = new JSONObject();
-                table.put("id", item.get("id").getS());
-                table.put("number", item.get("number").getN());
-                table.put("places", item.get("places").getN());
-                table.put("isVip", item.get("isVip").getBOOL());
-                if (item.containsKey("minOrder")) {
-                    table.put("minOrder", Integer.parseInt(item.get("minOrder").getN()));
-                } else {
-                    table.put("minOrder", JSONObject.NULL);
-                }
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Map<String, Object>> tablesList = new ArrayList<>();
 
-                tables.put(table);
+            scanResponse.getItems().forEach(item -> {
+                Map<String, Object> table = new LinkedHashMap<>();
+                table.put("id", Integer.parseInt(item.get("id").getS())); // Convert `id` to Integer
+                table.put("number", Integer.parseInt(item.get("number").getN())); // Convert `number` to Integer
+                table.put("places", Integer.parseInt(item.get("places").getN())); // Convert `places` to Integer
+                table.put("isVip", item.get("isVip").getBOOL()); // Boolean field
+                table.put("minOrder", item.containsKey("minOrder") ? Integer.parseInt(item.get("minOrder").getN()) : null); // Optional field
+                tablesList.add(table);
             });
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("tables", tablesList);
 
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(200)
-                    .withBody(new JSONObject().put("tables", tables).toString());
+                    .withBody(objectMapper.writeValueAsString(response));
         } catch (Exception e) {
+            context.getLogger().log("Error: " + e.getMessage());
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
                     .withBody(new JSONObject().put("error", e.getMessage()).toString());
