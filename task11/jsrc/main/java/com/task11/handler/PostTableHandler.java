@@ -30,10 +30,10 @@ public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEv
         try {
             JSONObject requestBody = new JSONObject(input.getBody());
             validateRequestBody(requestBody);
-            String id = UUID.randomUUID().toString();
+
 
             Item item = new Item()
-                .withPrimaryKey("id", id)
+                .withPrimaryKey("id", requestBody.getInt("id"))
                 .withNumber("number", requestBody.getInt("number"))
                 .withNumber("places", requestBody.getInt("places"))
                 .withBoolean("isVip", requestBody.getBoolean("isVip"));
@@ -45,7 +45,7 @@ public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEv
 
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(200)
-                    .withBody(new JSONObject().put("id", id).toString());
+                    .withBody(new JSONObject().put("id", requestBody.getInt("id")).toString());
         } catch (Exception e) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
