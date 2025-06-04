@@ -12,6 +12,7 @@
             "dynamodb:PutItem",
             "dynamodb:Batch*",
             "dynamodb:DeleteItem",
+            "dynamodb:Scan",
             "ssm:PutParameter",
             "ssm:GetParameter",
             "kms:Decrypt"
@@ -137,27 +138,23 @@
       "/tables": {
         "enable_cors": true,
         "GET": {
-          "enable_proxy": true,
           "authorization_type": "authorizer",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
-          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true
         },
         "POST": {
-          "enable_proxy": true,
           "authorization_type": "authorizer",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
-          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true
@@ -166,15 +163,11 @@
       "/tables/{tableId}": {
         "enable_cors": true,
         "GET": {
-          "enable_proxy": true,
           "authorization_type": "authorizer",
-          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
-          "method_request_parameters": {
-            "method.request.path.tableId": true
-          },
+          "method_request_parameters": {},
           "integration_request_body_template": {},
           "responses": [],
           "integration_responses": [],
@@ -183,10 +176,8 @@
       },
       "/reservations": {
         "enable_cors": true,
-        "POST": {
-          "enable_proxy": true,
+        "GET": {
           "authorization_type": "authorizer",
-          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
@@ -196,10 +187,8 @@
           "integration_responses": [],
           "default_error_pattern": true
         },
-        "GET": {
-          "enable_proxy": true,
+        "POST": {
           "authorization_type": "authorizer",
-          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
