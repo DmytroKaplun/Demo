@@ -94,7 +94,7 @@
       }
     ],
     "authorizers": {
-      "authorizer_name": {
+      "authorizer": {
         "type": "COGNITO_USER_POOLS",
         "identity_source": "method.request.header.Authorization",
         "user_pools": [
@@ -138,24 +138,26 @@
         "enable_cors": true,
         "GET": {
           "enable_proxy": true,
-          "authorization_type": "COGNITO_USER_POOLS",
+          "authorization_type": "authorizer",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true
         },
         "POST": {
           "enable_proxy": true,
-          "authorization_type": "COGNITO_USER_POOLS",
+          "authorization_type": "authorizer",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true
@@ -165,7 +167,8 @@
         "enable_cors": true,
         "GET": {
           "enable_proxy": true,
-          "authorization_type": "COGNITO_USER_POOLS",
+          "authorization_type": "authorizer",
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
@@ -182,7 +185,8 @@
         "enable_cors": true,
         "POST": {
           "enable_proxy": true,
-          "authorization_type": "COGNITO_USER_POOLS",
+          "authorization_type": "authorizer",
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
@@ -194,7 +198,8 @@
         },
         "GET": {
           "enable_proxy": true,
-          "authorization_type": "COGNITO_USER_POOLS",
+          "authorization_type": "authorizer",
+          "integration_passthrough_behavior": "WHEN_NO_TEMPLATES",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
