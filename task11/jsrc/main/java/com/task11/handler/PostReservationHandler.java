@@ -37,7 +37,7 @@ public class PostReservationHandler implements RequestHandler<APIGatewayProxyReq
 
             String reservationId = UUID.randomUUID().toString();
             Item item = new Item()
-                    .withPrimaryKey("reservationId", reservationId )
+                    .withPrimaryKey("id", reservationId )
                     .withNumber("tableNumber", requestBody.getInt("tableNumber"))
                     .withString("clientName", requestBody.getString("clientName"))
                     .withString("phoneNumber", requestBody.getString("phoneNumber"))
