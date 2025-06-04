@@ -87,8 +87,14 @@
   "task11_api": {
     "resource_type": "api_gateway",
     "deploy_stage": "api",
+    "dependencies": [
+      {
+        "resource_name": "api_handler",
+        "resource_type": "lambda"
+      }
+    ],
     "authorizers": {
-      "authorizer": {
+      "authorizer_name": {
         "type": "COGNITO_USER_POOLS",
         "identity_source": "method.request.header.Authorization",
         "user_pools": [
@@ -104,7 +110,7 @@
           "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
@@ -119,7 +125,7 @@
           "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
@@ -133,9 +139,8 @@
         "GET": {
           "enable_proxy": true,
           "authorization_type": "COGNITO_USER_POOLS",
-          "authorizer_name": "authorizer",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
@@ -146,9 +151,8 @@
         "POST": {
           "enable_proxy": true,
           "authorization_type": "COGNITO_USER_POOLS",
-          "authorizer_name": "authorizer",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
@@ -162,9 +166,8 @@
         "GET": {
           "enable_proxy": true,
           "authorization_type": "COGNITO_USER_POOLS",
-          "authorizer_name": "authorizer",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {
             "method.request.path.tableId": true
@@ -180,9 +183,8 @@
         "POST": {
           "enable_proxy": true,
           "authorization_type": "COGNITO_USER_POOLS",
-          "authorizer_name": "authorizer",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
@@ -193,9 +195,8 @@
         "GET": {
           "enable_proxy": true,
           "authorization_type": "COGNITO_USER_POOLS",
-          "authorizer_name": "authorizer",
           "integration_type": "lambda",
-          "lambda_name": "api-handler",
+          "lambda_name": "api_handler",
           "api_key_required": false,
           "method_request_parameters": {},
           "integration_request_body_template": {},
