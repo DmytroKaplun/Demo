@@ -12,7 +12,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import org.json.JSONObject;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.UUID;
 
 public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private static final String TABLE_NAME = "tables_table";
@@ -30,7 +30,7 @@ public class PostTableHandler implements RequestHandler<APIGatewayProxyRequestEv
         try {
             JSONObject requestBody = new JSONObject(input.getBody());
             validateRequestBody(requestBody);
-            int id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
+            String id = UUID.randomUUID().toString();
 
             Item item = new Item()
                 .withPrimaryKey("id", id)
