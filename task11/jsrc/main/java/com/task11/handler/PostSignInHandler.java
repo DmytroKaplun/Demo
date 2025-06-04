@@ -26,15 +26,17 @@ public class PostSignInHandler extends CognitoSupport implements RequestHandler<
                     .authenticationResult()
                     .idToken();
 
+            JSONObject responseBody = new JSONObject();
+            responseBody.put("idToken", idToken);
+
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(200)
-                    .withBody(new JSONObject("idToken", idToken).toString());
+                    .withBody(responseBody.toString());
         } catch (Exception e) {
+            context.getLogger().log("Error: " + e.getMessage());
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
                     .withBody("There was an error in the request.");
         }
     }
-
-
 }

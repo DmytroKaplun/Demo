@@ -29,7 +29,7 @@ public class PostSignUpHandler extends CognitoSupport implements RequestHandler<
         } catch (Exception e) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
-                    .withBody("There was an error in the request.");
+                    .withBody(new JSONObject().put("error", e.getStackTrace()).toString());
         }
     }
 }

@@ -27,7 +27,7 @@ public abstract class CognitoSupport {
 
     protected AdminInitiateAuthResponse cognitoSignIn(String email, String password) {
         Map<String, String> authParams = Map.of(
-                "EMAIL", email,
+                "USERNAME", email,
                 "PASSWORD", password
         );
 
