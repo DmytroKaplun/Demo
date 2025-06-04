@@ -59,7 +59,7 @@
     "resource_type": "iam_role",
     "tags": {}
   },
-  "${booking_userpool}": {
+  "simple-booking-userpool": {
     "resource_type": "cognito_idp",
     "password_policy": {
       "minimum_length": 12,
@@ -87,18 +87,12 @@
   "task11_api": {
     "resource_type": "api_gateway",
     "deploy_stage": "api",
-    "dependencies": [
-      {
-        "resource_name": "api_handler",
-        "resource_type": "lambda"
-      }
-    ],
     "authorizers": {
       "authorizer": {
         "type": "COGNITO_USER_POOLS",
         "identity_source": "method.request.header.Authorization",
         "user_pools": [
-          "${booking_userpool}"
+          "simple-booking-userpool"
         ],
         "ttl": 300
       }
@@ -108,7 +102,8 @@
         "enable_cors": false,
         "POST": {
           "enable_proxy": true,
-          "authorization_type": "NONE",
+          "authorization_type": "COGNITO_USER_POOLS",
+          "authorizer_name": "authorizer",
           "integration_type": "lambda",
           "lambda_name": "api-handler",
           "api_key_required": false,
