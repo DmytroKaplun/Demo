@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreate
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminRespondToAuthChallengeRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ChallengeNameType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMediumType;
@@ -41,11 +42,30 @@ public abstract class CognitoSupport {
     protected void cognitoSignUp(JSONObject requestBody) {
         String email = requestBody.getString("email");
         String password = requestBody.getString("password");
+        String firstName = requestBody.getString("firstName");
+        String lastName = requestBody.getString("lastName");
 
         cognitoClient.adminCreateUser(AdminCreateUserRequest.builder()
                         .userPoolId(userPoolId)
                         .username(email)
                         .temporaryPassword(password)
+                .userAttributes(
+                        AttributeType.builder()
+                                .name("given_name")
+                                .value(firstName)
+                                .build(),
+                        AttributeType.builder()
+                                .name("family_name")
+                                .value(lastName)
+                                .build(),
+                        AttributeType.builder()
+                                .name("email")
+                                .value(email)
+                                .build(),
+                        AttributeType.builder()
+                                .name("email_verified")
+                                .value("true")
+                                .build())
                         .desiredDeliveryMediums(DeliveryMediumType.EMAIL)
                         .messageAction("SUPPRESS")
                         .forceAliasCreation(Boolean.FALSE)
