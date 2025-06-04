@@ -32,11 +32,16 @@ public class GetTablesHandler implements RequestHandler<APIGatewayProxyRequestEv
             JSONArray tables = new JSONArray();
             scanResponse.getItems().forEach(item -> {
                 JSONObject table = new JSONObject();
-                table.put("id", item.get("id").getN());
+                table.put("id", item.get("id").getS());
                 table.put("number", item.get("number").getN());
                 table.put("places", item.get("places").getN());
                 table.put("isVip", item.get("isVip").getBOOL());
-                table.put("minOrder", item.getOrDefault("minOrder", null).getN());
+                if (item.containsKey("minOrder")) {
+                    table.put("minOrder", Integer.parseInt(item.get("minOrder").getN()));
+                } else {
+                    table.put("minOrder", JSONObject.NULL);
+                }
+
                 tables.put(table);
             });
 

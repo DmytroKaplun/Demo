@@ -40,7 +40,7 @@ public class GetTableByIdHandler implements RequestHandler<APIGatewayProxyReques
             Map<String, AttributeValue> item = itemResult.getItem();
 
             JSONObject itemJsonObject = new JSONObject()
-                    .put("id", Integer.parseInt(item.get("id").getN()))
+                    .put("id", item.get("id").getS())
                     .put("number", Integer.parseInt(item.get("number").getN()))
                     .put("places", Integer.parseInt(item.get("places").getN()))
                     .put("isVip", item.get("isVip").getBOOL());
