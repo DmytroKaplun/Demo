@@ -105,7 +105,7 @@
     },
     "resources": {
       "/signin": {
-        "enable_cors": false,
+        "enable_cors": true,
         "POST": {
           "enable_proxy": true,
           "authorization_type": "NONE",
@@ -120,7 +120,7 @@
         }
       },
       "/signup": {
-        "enable_cors": false,
+        "enable_cors": true,
         "POST": {
           "enable_proxy": true,
           "authorization_type": "NONE",
@@ -212,7 +212,7 @@
       }
     }
   },
-  "Tables": {
+  "${tables_table}": {
     "resource_type": "dynamodb_table",
     "hash_key_name": "id",
     "hash_key_type": "N",
@@ -222,7 +222,7 @@
     "autoscaling": [],
     "tags": {}
   },
-  "Reservations": {
+  "${reservations_table}": {
     "resource_type": "dynamodb_table",
     "hash_key_name": "id",
     "hash_key_type": "S",
