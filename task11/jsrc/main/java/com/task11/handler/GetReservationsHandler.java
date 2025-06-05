@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
 
             scanResponse.getItems().forEach(item -> {
                 Map<String, Object> table = new LinkedHashMap<>();
-                table.put("tableNumber", item.get("tableNumber").getN());
+                table.put("tableNumber", Integer.parseInt(item.get("tableNumber").getN())); // Convert to Integer
                 table.put("clientName", item.get("clientName").getS());
                 table.put("phoneNumber", item.get("phoneNumber").getS());
                 table.put("date", item.get("date").getS());
@@ -54,7 +55,7 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
             });
             tablesList.sort(Comparator.comparingInt(o -> Integer.parseInt((String) o.get("tableNumber"))));
 
-            Map<String, Object> response = new LinkedHashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("reservations", tablesList);
 
             return new APIGatewayProxyResponseEvent()
