@@ -56,7 +56,7 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
             Map<String, Object> response = new HashMap<>();
             response.put("reservations", tablesList);
 
-            return createResponse(200, response.toString());
+            return createResponse(200, objectMapper.writeValueAsString(response));
         } catch (Exception e) {
             JSONObject errorResponse = new JSONObject().put("error", e.getMessage());
             return createResponse(400, errorResponse.toString());
