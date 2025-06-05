@@ -14,10 +14,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class GetReservationsHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final AmazonDynamoDB dynamoDbClient;
@@ -48,6 +52,7 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
                 table.put("slotTimeEnd", item.get("slotTimeEnd").getS());
                 tablesList.add(table);
             });
+            tablesList.sort(Comparator.comparingInt(o -> Integer.parseInt((String) o.get("tableNumber"))));
 
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("reservations", tablesList);
