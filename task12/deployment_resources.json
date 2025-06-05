@@ -115,14 +115,20 @@
       "Version": "2012-10-17",
       "Statement": [
         {
+          "Sid": "WebSiteHostingGetObject",
           "Effect": "Allow",
           "Principal": "*",
-          "Action": "s3:GetObject",
-          "Resource": "arn:aws:s3:::api-ui-hoster/*",
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Resource": [
+            "arn:aws:s3:::api-ui-hoster/*"
+          ],
           "Condition": {
             "IpAddress": {
               "aws:SourceIp": [
-                "18.197.177.98/32"
+                "18.197.177.98/32",
+                "188.130.178.136/32"
               ]
             }
           }
@@ -135,10 +141,11 @@
       "block_public_policy": true,
       "restrict_public_buckets": true
     },
+    "tags": {},
     "website_hosting": {
-      "index_document": "swagger_src/task12_api_ui/index.html",
-      "error_document": "swagger_src/task12_api_ui/index.html"
-    },
-    "tags": {}
+      "enabled": true,
+      "index_document": "index.html",
+      "error_document": "error.html"
+    }
   }
 }
