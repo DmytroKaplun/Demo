@@ -13,6 +13,7 @@
             "dynamodb:Batch*",
             "dynamodb:DeleteItem",
             "dynamodb:Scan",
+            "dynamodb:UpdateItem",
             "ssm:PutParameter",
             "ssm:GetParameter",
             "kms:Decrypt"
@@ -39,7 +40,8 @@
             "cognito-idp:GetIdentityProviderByIdentifier",
             "cognito-idp:ListUserPools",
             "cognito-idp:ListUserPoolClients",
-            "cognito-idp:AdminRespondToAuthChallenge"
+            "cognito-idp:AdminRespondToAuthChallenge",
+            "cognito-idp:AdminConfirmSignUp"
           ],
           "Effect": "Allow",
           "Resource": "*"
