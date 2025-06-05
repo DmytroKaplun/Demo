@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Lambda" target="SYSTEM_OUT">
+            <LambdaJsonLayout>
+                <KeyValuePair key="timestamp" value="$${date:yyyy-MM-dd'T'HH:mm:ss.SSSZ}"/>
+                <KeyValuePair key="thread" value="$${ctx:AWSRequestId}"/>
+            </LambdaJsonLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Lambda"/>
+        </Root>
+        <Logger name="com.amazonaws" level="INFO"/>
+        <Logger name="org.apache" level="INFO"/>
+    </Loggers>
+</Configuration>
