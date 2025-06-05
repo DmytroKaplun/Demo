@@ -53,7 +53,7 @@ public class GetReservationsHandler implements RequestHandler<APIGatewayProxyReq
                 table.put("slotTimeEnd", item.get("slotTimeEnd").getS());
                 tablesList.add(table);
             });
-            tablesList.sort(Comparator.comparingInt(o -> Integer.parseInt((String) o.get("tableNumber"))));
+            tablesList.sort(Comparator.comparingInt(o -> (Integer) o.get("tableNumber")));
 
             Map<String, Object> response = new HashMap<>();
             response.put("reservations", tablesList);
