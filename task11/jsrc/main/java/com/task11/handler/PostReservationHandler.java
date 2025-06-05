@@ -193,8 +193,8 @@ public class PostReservationHandler implements RequestHandler<APIGatewayProxyReq
 private boolean hasConflictingReservation(int tableNumber, String date, String slotTimeStart, String slotTimeEnd) {
     try {
         Map<String, String> expressionAttributeNames = Map.of(
-                "#tableNumber", "tableNumber", // Escape the reserved keyword `tableNumber`
-                "#reservationDate", "reservationDate" // Escape the reserved keyword `reservationDate`
+                "#tableNumber", "tableNumber",
+                "#date", "date"
         );
         // Define Expression Attribute Values
         Map<String, AttributeValue> expressionAttributeValues = Map.of(
@@ -203,8 +203,8 @@ private boolean hasConflictingReservation(int tableNumber, String date, String s
         );
         // Use a Scan operation
         ScanRequest scanRequest = new ScanRequest()
-                .withTableName(getTablesName())
-                .withFilterExpression("#tableNumber = :tableNumber and #reservationDate = :date")
+                .withTableName(getReservationsName())  // Changed from getTablesName() to getReservationsName()
+                .withFilterExpression("#tableNumber = :tableNumber and #date = :date")
                 .withExpressionAttributeNames(expressionAttributeNames)
                 .withExpressionAttributeValues(expressionAttributeValues);
 
