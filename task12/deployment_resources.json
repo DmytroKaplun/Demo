@@ -136,7 +136,10 @@
       "block_public_policy": true,
       "restrict_public_buckets": true
     },
-    "website_hosting": true,
+    "website_hosting": {
+      "index_document": "index.html",
+      "error_document": "index.html"
+    },
     "tags": {}
   }
 }
