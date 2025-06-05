@@ -122,8 +122,7 @@
           "Condition": {
             "IpAddress": {
               "aws:SourceIp": [
-                "18.197.177.98/32",
-                "188.130.178.136/32"
+                "18.197.177.98/32"
               ]
             }
           }
@@ -133,11 +132,12 @@
     "public_access_block": {
       "block_public_acls": true,
       "ignore_public_acls": true,
-      "block_public_policy": false,
+      "block_public_policy": true,
       "restrict_public_buckets": true
     },
     "website_hosting": {
-      "index_document": "index.html"
+      "index_document": "swagger_src/task12_api_ui/index.html",
+      "error_document": "swagger_src/task12_api_ui/index.html"
     },
     "tags": {}
   }
